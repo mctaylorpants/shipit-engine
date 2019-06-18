@@ -34,6 +34,7 @@
           <span class="caption--ready">Abort and Rollback</span>
           <span class="caption--pending">Aborting with Rollback...</span>
         <% end %>
+        <span class="deploy-status">(Rollback of: <span class="short-sha"><%= link_to_github_range(@stack, task&.until_commit, rollback_until_commit(task)) %></span>)</span>
       <% end %>
     </div>
   </div>

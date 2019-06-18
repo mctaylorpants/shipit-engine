@@ -5,6 +5,7 @@ module Shipit
     before_action :load_stack
     before_action :load_deploy, only: %i(show rollback revert)
     before_action :load_until_commit, only: :create
+    helper_method :rollback_until_commit
 
     def new
       @commit = @stack.commits.by_sha!(params[:sha])
@@ -40,6 +41,16 @@ module Shipit
       redirect_to rollback_stack_deploy_path(@stack, previous_deploy)
     end
 
+    def rollback_until_commit(task)
+      if previous_successful_deploy(task)
+        @rollback_until_commit ||= Commit.where(
+          stack_id: @previous_successful_deploy.stack_id,
+          id: @previous_successful_deploy.until_commit_id,
+        ).first
+      end
+      @rollback_until_commit
+    end
+
     private
 
     def load_deploy
@@ -56,6 +67,10 @@ module Shipit
 
     def deploy_params
       @deploy_params ||= params.require(:deploy).permit(:until_commit_id, env: @stack.deploy_variables.map(&:name))
+    end
+
+    def previous_successful_deploy(task)
+      @previous_successful_deploy ||= task&.previous_success
     end
   end
 end

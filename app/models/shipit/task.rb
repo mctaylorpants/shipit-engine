@@ -235,6 +235,10 @@ module Shipit
       false
     end
 
+    def previous_success
+      Task.previous_successful(id)
+    end
+
     def title
       definition.render_title(env)
     end
